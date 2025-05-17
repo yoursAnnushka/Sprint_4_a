@@ -3,25 +3,47 @@ package ru.scooter.tests;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import ru.scooter.pages.HomePageScooter;
-import ru.scooter.pages.constants.Answers;
 
+import static ru.scooter.pages.HomePageScooter.HOME_PAGE_SCOOTER_URL;
+
+@RunWith(Parameterized.class)
 public class HomePageFAQTest {
     private WebDriver driver;
+    private final int number;
 
     @Before
     public void startUp() {
         // драйвер для браузера Chrome
         driver = new ChromeDriver();
+        // переход на страницу тестового приложения
+        driver.get(HOME_PAGE_SCOOTER_URL);
+    }
+
+    public HomePageFAQTest(int number) {
+        this.number = number;
+    }
+
+    @Parameterized.Parameters(name = "Проверка открытия текста при нажатии на стрелку {0}")
+    public static Object[][] getNumberQuestionAndAnswer() {
+        return new Object[][]{
+                {0},
+                {1},
+                {2},
+                {3},
+                {4},
+                {5},
+                {6},
+                {7},
+        };
     }
 
     @Test
     public void openFAQShowsCorrectAnswer() {
-        // переход на страницу тестового приложения
-        driver.get("https://qa-scooter.praktikum-services.ru/");
-
         // создать объект класса домашней страницы
         HomePageScooter objOpenFAQ = new HomePageScooter(driver);
 
@@ -29,29 +51,8 @@ public class HomePageFAQTest {
         objOpenFAQ.clickAcceptCookiesButton();
 
         // раскрыть вопрос и проверить текст ответа
-        objOpenFAQ.clickQuestionAboutPrice();
-        objOpenFAQ.isCorrectText(objOpenFAQ.getAnswerAboutPrice(), Answers.questionAboutPriceText);
-
-        objOpenFAQ.clickQuestionAboutRentingSeveralScooters();
-        objOpenFAQ.isCorrectText(objOpenFAQ.getAnswerAboutRentingSeveralScooters(), Answers.questionAboutRentingSeveralScootersText);
-
-        objOpenFAQ.clickQuestionAboutRentalTime();
-        objOpenFAQ.isCorrectText(objOpenFAQ.getAnswerAboutRentalTime(), Answers.questionAboutRentalTimeText);
-
-        objOpenFAQ.clickQuestionAboutOrderingForToday();
-        objOpenFAQ.isCorrectText(objOpenFAQ.getAnswerAboutOrderingForToday(), Answers.questionAboutOrderingForTodayText);
-
-        objOpenFAQ.clickQuestionAboutChangingLeaseTerm();
-        objOpenFAQ.isCorrectText(objOpenFAQ.getAnswerAboutChangingLeaseTerm(), Answers.questionAboutChangingLeaseTermText);
-
-        objOpenFAQ.clickQuestionAboutCharger();
-        objOpenFAQ.isCorrectText(objOpenFAQ.getAnswerAboutCharger(), Answers.questionAboutChargerText);
-
-        objOpenFAQ.clickQuestionAboutOrderCancellation();
-        objOpenFAQ.isCorrectText(objOpenFAQ.getAnswerAboutOrderCancellation(), Answers.questionAboutOrderCancellationText);
-
-        objOpenFAQ.clickQuestionAboutDeliveryOutsideMKAD();
-        objOpenFAQ.isCorrectText(objOpenFAQ.getAnswerAboutDeliveryOutsideMKAD(), Answers.questionAboutDeliveryOutsideMKADText);
+        objOpenFAQ.clickQuestion(number);
+        objOpenFAQ.isCorrectText(number);
     }
 
     @After

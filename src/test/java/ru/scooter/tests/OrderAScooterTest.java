@@ -8,6 +8,9 @@ import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import ru.scooter.pages.HomePageScooter;
+import ru.scooter.pages.OrderAScooter;
+
+import static ru.scooter.pages.HomePageScooter.HOME_PAGE_SCOOTER_URL;
 
 @RunWith(Parameterized.class)
 public class OrderAScooterTest {
@@ -24,6 +27,8 @@ public class OrderAScooterTest {
     public void startUp() {
         // драйвер для браузера Chrome
         driver = new ChromeDriver();
+        // переход на страницу тестового приложения
+        driver.get(HOME_PAGE_SCOOTER_URL);
     }
 
     public OrderAScooterTest(String name, String surname, String address, String metroStation, String phoneNumber, String deliveryDate, String rentalPeriod) {
@@ -36,7 +41,7 @@ public class OrderAScooterTest {
         this.rentalPeriod = rentalPeriod;
     }
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "Тестовые данные для заполнения полей формы заказа: {0}; {1}; {2}; {3}; {4}; {5}; {6}")
     public static Object[][] getScooterRentDetails() {
         return new Object[][]{
                 {"Анна", "Ли", "Суворова, 12", "Чистые пруды", "89333333333", "12.12.2025", "трое суток"},
@@ -46,20 +51,20 @@ public class OrderAScooterTest {
 
     @Test
     public void orderAScooterSuccessfulOrderCreation() {
-        // переход на страницу тестового приложения
-        driver.get("https://qa-scooter.praktikum-services.ru/");
-
         // создать объект класса домашней страницы
-        HomePageScooter objOrderAScooter = new HomePageScooter(driver);
+        HomePageScooter objHomePage = new HomePageScooter(driver);
 
         // принять куки
-        objOrderAScooter.clickAcceptCookiesButton();
+        objHomePage.clickAcceptCookiesButton();
 
         // нажать на кнопку "Заказать" вверху главной страницы
-        objOrderAScooter.clickOrderButtonInHeaderHomePage();
+        objHomePage.clickOrderButtonInHeaderHomePage();
 
         // подождать открытия формы заказа
-        objOrderAScooter.waitForScooterRenterDetailsWindow();
+        objHomePage.waitForScooterRenterDetailsWindow();
+
+        // создать объект класса создания заказа
+        OrderAScooter objOrderAScooter = new OrderAScooter(driver);
 
         // заполняем форму заказа
         objOrderAScooter.setNameField(name);
@@ -75,8 +80,8 @@ public class OrderAScooterTest {
         objOrderAScooter.waitForOrderConfirmationWindow();
         objOrderAScooter.clickYesCreateOrderButton();
 
-        // ждём появления всплывающего окна с сообщением об успешном создании заказа
-        objOrderAScooter.waitForCreatedOrderWindow();
+        // проверяем появление всплывающего окна с сообщением об успешном создании заказа
+        objOrderAScooter.isOpenCreatedOrderWindow();
     }
 
     @After
